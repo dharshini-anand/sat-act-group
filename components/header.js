@@ -4,14 +4,12 @@ import Nav from 'react-bootstrap/Nav'
 import Button  from 'react-bootstrap/Button'
 import { useAuth } from "../lib/auth";
 
-
 export default function Header() {
     const {user, loading, signOut} = useAuth();
     return (      
         <Navbar bg="light" expand="lg">
             <Container>
           <Navbar.Brand href="#home">SAT/ACT Group</Navbar.Brand>
-        
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
