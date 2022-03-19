@@ -11,6 +11,7 @@ import {
 import { db } from "../lib/firebase"
 import CourseDash from "../components/coursedash";
 import { onValue, ref } from "firebase/database";
+import { Accordion } from "react-bootstrap";
 
 export default function Dashboard () {
     const router = useRouter();
@@ -54,10 +55,10 @@ export default function Dashboard () {
         return (
             <div>
                 <h2>{user && user.first_name}&apos;s Dashboard</h2>
-                {courses.length == 0 && (<Link href = "/"><a>Register for a course!</a></Link>)}
-                {courses.map((course) => (
-                    <CourseDash key = {course.key} course = {course}/>
-                ))}
+                    {courses.length == 0 && (<Link href = "/"><a>Register for a course!</a></Link>)}
+                    {courses.map((course, index) => (
+                        <CourseDash key = {index} course = {course}/>
+                    ))}
             </div>
         )
     }
