@@ -9,32 +9,35 @@ import {
 } from "firebase/firestore";
 import { db } from "../lib/firebase"
 import CourseDash from "../components/coursedash";
+import { onValue, ref } from "firebase/database";
 
 export default function Dashboard () {
     const router = useRouter();
     const auth = useAuth();
     const [user, setUser] = useState([])
-    const [classes, setClasses] = useState([])
+    const [courses, setCourses] = useState([])
     useEffect(() => {
         let userCall;
         let classCall;
         if (auth.user) {
-            userCall = onSnapshot(query(collection(db, "users"), where("uid", "==", auth.user.uid)), (snapshot) => {
-                const userDocs = snapshot.docs.map(doc => {
-                    return {id : doc.id,...doc.data()}
-                })
-                setUser(userDocs[0]);
+            const userRef = ref(db, 'users/' + auth.user.uid);
+            userCall = onValue(userRef, (snapshot) => {
+                const data = snapshot.val()
+                setUser(data);
             })
-            classCall = onSnapshot(query(collection(db, `users/${auth.user.uid}/classes`), where("id", "!=", "test doc")), (snapshot) => {
-                const classDocs = snapshot.docs.map(doc => {
-                    return {id: doc.id,...doc.data()}
-                })
-                setClasses(classDocs)
+            const classRef = ref(db, 'users/' + auth.user.uid + '/classes');
+            classCall = onValue(classRef, (snapshot) => {
+                let classes = [];
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        classes.push({key: childSnapshot.key,... childSnapshot.val()})
+                    })
+                }
+                setCourses(classes)
             })
         }
         return () => {
             userCall?.()
-            classCall?.()
         }
     }, [auth.user]);
     if (auth.loading) {
@@ -50,8 +53,8 @@ export default function Dashboard () {
         return (
             <div>
                 <h2>{user && user.first_name}&apos;s Dashboard</h2>
-                {classes.map((course) => (
-                    <CourseDash key = {course.id} course = {course}/>
+                {courses.map((course) => (
+                    <CourseDash key = {course.key} course = {course}/>
                 ))}
             </div>
         )

@@ -14,51 +14,40 @@ import {
   addDoc
 } from "firebase/firestore";
 import { db } from "../../lib/firebase"
+import { onValue, ref, set } from 'firebase/database'
 
 export default function ProductPage () {
     const router = useRouter()
     const auth = useAuth()
-    const { cid } = router.query
     const [ course, setCourse ] = useState([])
     const [ registered, setRegistered ] = useState([])
     const [ score, setScore ] = useState([])
     const handleSubmit = async (e, score) => {
       e.preventDefault()
-      const userClasses = collection(db, `users/${auth.user.uid}/classes`)
+      const userClassRef = ref(db, "users/" + auth.user.uid + "/classes/" + course.id)
       try {
-        await addDoc(userClasses, {
+        set(userClassRef, {
+          name: course.name,
           goal_score: score,
-          id: course.id,
-          name: course.name
         })
       } catch (err) {
         alert(err)
       }
     }
-    //useEffect
-    // find current course in courses
-    // find courses in user
-    // in courses find current course by course ids
-    // if previous is undefined set course as unregistered
-    // else set course as registered
     useEffect(() => {
       const last = window.location.href.split('/').pop();
-      var courseCall = onSnapshot(query(collection(db, "courses")), where("id", "==", last), (snapshot) => {
-        const courseDoc = snapshot.docs.map(doc => {
-          return {id: doc.id,...doc.data()}
-        })
-        setCourse(courseDoc.find(course => course.id === last))
+      const courseRef = ref(db, "classes/" + last)
+      var courseCall = onValue(courseRef, (snapshot) => {
+        console.log(snapshot.val())
+        const data = snapshot.val()
+        setCourse(data)
       })
       let userCourseCall
       if (auth.user) {
         if (!course.id) return;
-        userCourseCall = onSnapshot(query(collection(db,`users/${auth.user.uid}/classes`), where("id", "==", course.id)), (snapshot) => {
-          const userCourse = snapshot.docs.map(doc => {
-            return {id: doc.id,...doc.data()}
-          })
-          const matchCourse = userCourse.filter(userCourse => userCourse.id === course.id)
-          console.log(matchCourse)
-          if (matchCourse.length == 1) {
+        const userCourseRef = ref(db, "users/" + auth.user.uid + "/classes/" + course.id)
+        userCourseCall = onValue(userCourseRef, (snapshot) => {
+          if (snapshot.exists()) {
             setRegistered(true)
           } else {
             setRegistered(false)

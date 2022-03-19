@@ -2,31 +2,26 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import style from "../styles/index.module.css";
-import Layout from '../components/layout'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useAuth } from "../lib/auth";
-import {
-    onSnapshot,
-    collection
-} from "firebase/firestore";
 import { db } from "../lib/firebase"
 import img from "../public/satact.png" 
+import { onValue, ref } from "firebase/database";
 
 
 export default function Home({ products }) {
-  const auth = useAuth();
-  const router = useRouter();
   const [courses, setCourses] = useState([]);
-  const [userCourses, setUserCourses] = useState([]);
   useEffect(() => {
-    var courseCall = onSnapshot(collection(db, "courses"), (snapshot) => {
-      const courseDocs = snapshot.docs.map(doc => {
-        return {id: doc.id,...doc.data()}
-      })
-      setCourses(courseDocs);
-    })
+    var courseRef = ref(db, "classes/");
+    const courseCall = onValue(courseRef, (snapshot) => {
+      let classes = [];
+      if (snapshot.exists()) {
+          snapshot.forEach((childSnapshot) => {
+              classes.push({key: childSnapshot.key,... childSnapshot.val()})
+          })
+      }
+      setCourses(classes)
+  })
     return () => {
       courseCall()
     }

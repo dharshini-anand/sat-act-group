@@ -12,7 +12,7 @@ export default function SignUpForm () {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
 
-    const signUp = (event, firtName, lastName, email, password) => {
+    const signUp = (event, firstName, lastName, email, password) => {
         auth
         .signUp(firstName, lastName, email, password)
         .then(() => {
