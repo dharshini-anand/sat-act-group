@@ -25,7 +25,7 @@ export default function Dashboard () {
                 })
                 setUser(userDocs[0]);
             })
-            classCall = onSnapshot(collection(db, `users/${auth.user.uid}/classes`), (snapshot) => {
+            classCall = onSnapshot(query(collection(db, `users/${auth.user.uid}/classes`), where("id", "!=", "test doc")), (snapshot) => {
                 const classDocs = snapshot.docs.map(doc => {
                     return {id: doc.id,...doc.data()}
                 })
