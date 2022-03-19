@@ -21,7 +21,7 @@ export default function Home({ products }) {
           })
       }
       setCourses(classes)
-  })
+    })
     return () => {
       courseCall()
     }

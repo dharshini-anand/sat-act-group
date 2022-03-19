@@ -1,23 +1,13 @@
 import Image from 'next/image'
 import Head from 'next/head'
-import { getProductById, getProducts } from '../../lib/api'
 import style from '../../styles/product.module.css'
 import img from "../../public/satact.png" 
-import { useRouter } from "next/router";
 import { useAuth } from "../../lib/auth";
 import { useEffect, useState } from 'react'
-import {
-  onSnapshot,
-  collection,
-  query,
-  where,
-  addDoc
-} from "firebase/firestore";
 import { db } from "../../lib/firebase"
 import { onValue, ref, set } from 'firebase/database'
 
 export default function ProductPage () {
-    const router = useRouter()
     const auth = useAuth()
     const [ course, setCourse ] = useState([])
     const [ registered, setRegistered ] = useState([])
@@ -29,6 +19,7 @@ export default function ProductPage () {
         set(userClassRef, {
           name: course.name,
           goal_score: score,
+          id: course.id
         })
       } catch (err) {
         alert(err)
