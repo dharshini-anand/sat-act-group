@@ -18,7 +18,7 @@ export default function ProductPage () {
       try {
         set(userClassRef, {
           name: course.name,
-          goal_score: score,
+          goal_score: parseInt(score),
           id: course.id
         })
       } catch (err) {
@@ -70,7 +70,11 @@ export default function ProductPage () {
             <div className="flex justify-center items-center flex-col">
               <h4>Register Here:</h4>
               <label htmlFor="score" className="block text-sm font-medium leading-5 text-gray-700">Goal Score</label>
-              <input className= "appearance-none block w-1/6 object-center px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder= 'Goal Score' type='text' name='score' onChange={(e) => setScore(e.target.value)}/>
+              <input onKeyPress = {(e) => {
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}className= "appearance-none block w-1/6 object-center px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder= 'Goal Score' type='text' name='score' onChange={(e) => setScore(e.target.value)}/>
               <button className= "w-f1/6 flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"onClick={(e) => handleSubmit(e, score)}>Register</button>
             </div>
           )
