@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "../lib/auth";
 import {
@@ -53,6 +54,7 @@ export default function Dashboard () {
         return (
             <div>
                 <h2>{user && user.first_name}&apos;s Dashboard</h2>
+                {courses.length == 0 && (<Link href = "/"><a>Register for a course!</a></Link>)}
                 {courses.map((course) => (
                     <CourseDash key = {course.key} course = {course}/>
                 ))}
