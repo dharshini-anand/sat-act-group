@@ -3,7 +3,9 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../lib/auth";
 import {
     onSnapshot,
-    collection
+    collection,
+    query,
+    where
 } from "firebase/firestore";
 import { db } from "../lib/firebase"
 import CourseDash from "../components/coursedash";
@@ -17,19 +19,16 @@ export default function Dashboard () {
         let userCall;
         let classCall;
         if (auth.user) {
-            userCall = onSnapshot(collection(db, "users"), (snapshot) => {
+            userCall = onSnapshot(query(collection(db, "users"), where("uid", "==", auth.user.uid)), (snapshot) => {
                 const userDocs = snapshot.docs.map(doc => {
                     return {id : doc.id,...doc.data()}
                 })
-                let currentUser = userDocs.find((user) => user.id == auth.user.uid)
-                console.log(currentUser)
-                setUser(currentUser);
+                setUser(userDocs[0]);
             })
             classCall = onSnapshot(collection(db, `users/${auth.user.uid}/classes`), (snapshot) => {
                 const classDocs = snapshot.docs.map(doc => {
                     return {id: doc.id,...doc.data()}
                 })
-                console.log(classDocs)
                 setClasses(classDocs)
             })
         }

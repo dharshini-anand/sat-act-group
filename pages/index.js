@@ -27,17 +27,8 @@ export default function Home({ products }) {
       })
       setCourses(courseDocs);
     })
-    let userCourseCall;
-    if (auth.user) {
-      userCourseCall = onSnapshot(collection(db, `users/${auth.user.uid}/      classes`), (snapshot) => {
-        const classDocs = snapshot.docs.map(doc => {
-            return {id: doc.id,...doc.data()}
-        })
-      })
-    }
     return () => {
       courseCall()
-      userCourseCall?.()
     }
   })
   return (
