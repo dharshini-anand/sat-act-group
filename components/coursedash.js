@@ -4,6 +4,7 @@ import { useAuth } from "../lib/auth";
 import { useState, useEffect } from "react";
 import { Alert, Card, ProgressBar, Button, Modal } from 'react-bootstrap';
 import { LineChart } from '@rsuite/charts'
+import { Score, BinaryScoreTree } from '../lib/bst'
 
 function convertToDate(timestamp) {
     const date = new Date(timestamp);
@@ -61,13 +62,17 @@ export default function CourseDash ( { course } ) {
             const scoresRef = ref(db, "users/" + auth.user.uid + "/classes/" + course.id + "/scores")
             scoreCall = onValue(scoresRef, (snapshot) => {
                 let scores = [];
+                let scoreTree = new BinaryScoreTree();
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const key = childSnapshot.key
                         const val = childSnapshot.val()
+                        scoreTree.insert(val.timestamp, val.score, val.notes)
                         scores.push({key: key,... val})
                     })
                 }
+                scoreTree.inOrder(scoreTree.getRoot())
+                scores = scoreTree.inOrderList
                 setScoreCollection(scores)
                 let data = [];
                 for (let i = 0; i < scores.length; i++) {
