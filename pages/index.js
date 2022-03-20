@@ -1,12 +1,11 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
-import style from "../styles/index.module.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState, useEffect } from "react";
 import { db } from "../lib/firebase"
 import img from "../public/satact.png" 
 import { onValue, ref } from "firebase/database";
+import { Card } from "react-bootstrap"
 
 
 export default function Home({ products }) {
@@ -31,29 +30,28 @@ export default function Home({ products }) {
       <Head>
         <title>SAT/ACT Group Courses</title>
       </Head>
-      <main>
-        <ul className={ style['product-grid'] }>
+      <h1>Available Courses</h1>
+      <div className = "container mx-auto grid grid-cols-4 ">
           { courses.map(product => ProductView({ product })) }
-        </ul>
-      </main>
+      </div>
     </>
   )
 }
 
 function ProductView ({ product }) {
   return (
-    <li key={ product.id }>
+    <div key={ product.id } className="p-2">
       <Link href={ `/courses/${ product.id }` } prefetch={ false }>
-        <a className={ style.product }>
-          <div className={ style['product-image'] }>
-            <Image alt="" height="427" width="640" src={ img } />
-          </div>
-          <div className={ style['product-description'] }>
-            { product.name }
-          </div>
-        </a>
+          <Card>
+            <Image src={img}/>
+            <Card.Body>
+              <h3 className='text-left'>{product.name}</h3>
+              <h5 className='text-left'>{product.teacher}</h5>
+              <p className='text-left'>{product.description}</p>
+            </Card.Body>
+          </Card>
       </Link>
-    </li>
+    </div>
   )
 }
 

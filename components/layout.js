@@ -37,7 +37,7 @@ const Layout = props => (
             h1,
             h2,
             h3 {
-                margin: 40px 0 30px;
+                margin: 30px 0 30px;
             }
 
             h1 {

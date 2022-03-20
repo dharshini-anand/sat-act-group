@@ -64,6 +64,7 @@ export default function ProductPage () {
         <div className={ style.header }>
           <h2>{ course.name }</h2>
           <p>{ course.teacher }</p>
+          <p>{course.description}</p>
           {registered == true
           ? (<p>Registered!</p>) 
           : (
