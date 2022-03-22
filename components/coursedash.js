@@ -2,7 +2,7 @@ import { onValue, ref, set, push, remove, serverTimestamp } from 'firebase/datab
 import { db } from '../lib/firebase'
 import { useAuth } from "../lib/auth";
 import { useState, useEffect } from "react";
-import { Alert, Card, ProgressBar, Button, Modal } from 'react-bootstrap';
+import { Alert, Card, ProgressBar, Button, Modal, Form } from 'react-bootstrap';
 import { LineChart } from '@rsuite/charts'
 import { Score, BinaryScoreTree } from '../lib/bst'
 
@@ -10,7 +10,7 @@ function convertToDate(timestamp) {
     const date = new Date(timestamp);
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 }
-function average(scores) {
+function average(scores, course) {
     const avg = 0;
     for (let i = 0; i < scores.length; i++) {
         avg += parseInt(scores[i].score)
@@ -18,9 +18,11 @@ function average(scores) {
     avg /= scores.length
     if (scores.length == 0) {
         return "---"
-    } else {
+    } else if (course && course.includes("SAT")) {
         return Math.round(avg / 10) * 10
-    } 
+    } else {
+        return Math.round(avg)
+    }
 }
 
 export default function CourseDash ( { course } ) {
@@ -60,19 +62,25 @@ export default function CourseDash ( { course } ) {
         let scoreCall
         if (auth.user) {
             const scoresRef = ref(db, "users/" + auth.user.uid + "/classes/" + course.id + "/scores")
+            // retrieve DataSnapshot
             scoreCall = onValue(scoresRef, (snapshot) => {
+                // list to store inOrder traversal
                 let scores = [];
+                // tree instance
                 let scoreTree = new BinaryScoreTree();
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const key = childSnapshot.key
                         const val = childSnapshot.val()
+                        // insert data into tree
                         scoreTree.insert(val.timestamp, val.score, val.notes)
                         scores.push({key: key,... val})
                     })
                 }
+                // traverse tree
                 scoreTree.inOrder(scoreTree.getRoot())
                 scores = scoreTree.inOrderList
+                // set state
                 setScoreCollection(scores)
                 let data = [];
                 for (let i = 0; i < scores.length; i++) {
@@ -93,7 +101,7 @@ export default function CourseDash ( { course } ) {
                 </Alert.Heading>
             </Alert>
             <div className='grid grid-cols-2'>
-                <h3 className='text-left'>Average Score: {average(scoreCollection)}</h3>
+                <h3 className='text-left'>Average Score: {average(scoreCollection, course.name)}</h3>
                 <h3 className='text-right'>Your goal score: {course.goal_score}</h3>
                 
             </div>
@@ -132,12 +140,25 @@ export default function CourseDash ( { course } ) {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="flex justify-center items-center flex-col py-2">
-                    <input onKeyPress = {(e) => {
-                    if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault();
-                    }}} className= "appearance-none block object-center px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" type='text' name='score' placeholder='New Score' onChange={(e) => setScore(e.target.value)}/>
-                    <input className= "appearance-none block object-center px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" type='text' name='notes' placeholder="notes" onChange={(e) => setNotes(e.target.value)}/>
-                    <button className= " flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out"onClick={(e) => handleSubmit(e, score, notes)}>Submit</button>
+                        <Form>
+                            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+                                <Form.Label>Score</Form.Label>
+                                <Form.Control type="text" onChange={(e) => setScore(e.target.value)} onKeyPress = {(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                                }}}/>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>Additional Notes</Form.Label>
+                                <Form.Control as="textarea" rows = {3} onChange={(e) => setNotes(e.target.value)} />
+                            </Form.Group>
+                            <div className="flex justify-center items-center py-2">
+                                <Button variant="primary" type="submit" onClick={(e) => handleSubmit(e, score, notes)}>
+                                    Submit
+                                </Button>
+                            </div>
+                            
+                        </Form>
                     </div>
                 </Modal.Body>
             </Modal>

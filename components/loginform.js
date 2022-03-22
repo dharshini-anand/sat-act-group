@@ -8,18 +8,20 @@ export default function LoginForm () {
     const auth = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const signIn = (event, email, password) => {
         auth
         .signIn(email, password)
         .then(() => {
-            router.push("/")
+            router.push("/dashboard")
         })
         .catch((error) => {
-            console.log(error);
+            setError(true);
         })
     }
     return (
         <div>
+            {error && <p>Invalid email or password.</p>}
             <div className= "rounded-md shadow-sm">
                 <label htmlFor="email" className="block text-sm font-medium leading-5 text-gray-700">Email</label>
                 <input id="email" type="email" name="email" 

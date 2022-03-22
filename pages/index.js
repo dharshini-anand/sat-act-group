@@ -8,17 +8,24 @@ import { onValue, ref } from "firebase/database";
 import { Card } from "react-bootstrap"
 
 
-export default function Home({ products }) {
+export default function Home() {
   const [courses, setCourses] = useState([]);
+  // asynchronous calls
   useEffect(() => {
+    // set reference to courses
     var courseRef = ref(db, "classes/");
     const courseCall = onValue(courseRef, (snapshot) => {
+      // store courses in list
       let classes = [];
+      // if there is data
       if (snapshot.exists()) {
+        // loop through data
           snapshot.forEach((childSnapshot) => {
+            // deserialize
               classes.push({key: childSnapshot.key,... childSnapshot.val()})
           })
       }
+      // set state
       setCourses(classes)
     })
     return () => {
