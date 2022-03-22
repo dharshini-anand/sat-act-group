@@ -109,6 +109,7 @@ export default function CourseDash ( { course } ) {
                 <ProgressBar now= {average(scoreCollection) != "---" && average(scoreCollection) * 100 / course.goal_score} striped/>
             </div>
             <div>
+                <h4>Your next session is on March 22, 2022.</h4>
                 <h3 className='text-left'>Your previous scores:</h3>
                 <LineChart name={course.name} data = {graphData}/>
                 <div className="grid grid-cols-3 items-center">

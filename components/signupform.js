@@ -16,7 +16,7 @@ export default function SignUpForm () {
         auth
         .signUp(firstName, lastName, email, password)
         .then(() => {
-            router.push("/sign-in")
+            router.push("/dashboard")
         })
         .catch((error) => {
             console.log(error)
